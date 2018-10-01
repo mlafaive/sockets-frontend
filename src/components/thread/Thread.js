@@ -25,9 +25,9 @@ class Thread extends Component {
     };
 
     this.socket = window.socketCluster.connect({
-      hostname: 'localhost',
-      secure: false,
-      port: 8000,
+      hostname: 'sockets-app.herokuapp.com',
+      secure: true,
+      port: 443
     });
     var self = this;
     var personalChannel = this.socket.subscribe(this.props.user.email);
@@ -161,7 +161,10 @@ class Thread extends Component {
     });
   }
   componentDidUpdate(prevProps) {
-    if (this.props.match.params.threadId && !this.props.threads[this.props.match.params.threadId].messages) {
+    if (
+      this.props.match.params.threadId &&
+      this.props.threads[this.props.match.params.threadId] && 
+      !this.props.threads[this.props.match.params.threadId].messages) {
       this.fetchMessages();
     }
   }

@@ -26,8 +26,8 @@ class App extends Component {
         	<div className="content">
 		        <Router>
 		        	<Switch>
+                <Route exact path="/login" component={Login}/>
 	          		<Route exact path="/:threadId?" component={Thread}/>
-	          		<Route exact path="/login" component={Login}/>
 	          		<Route component={Error404}/>
 		        	</Switch>
 		        </Router>
