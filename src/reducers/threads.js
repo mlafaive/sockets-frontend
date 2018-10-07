@@ -5,7 +5,8 @@ function copy_state(state) {
 			title: state[threadId].title,
 			messages: state[threadId].messages && Array.from(state[threadId].messages),
       currentMessage: state[threadId].currentMessage,
-      settings: state[threadId].settings
+      settings: state[threadId].settings,
+      sending: state[threadId].sending
 		}
 	}
 	return new_state;
@@ -39,6 +40,9 @@ export function threads(state = null, action) {
       return new_state;
     case 'TOGGLE_SETTINGS':
       new_state[action.threadId].settings = !new_state[action.threadId].settings;
+      return new_state;
+    case 'TOGGLE_SENDING':
+      new_state[action.threadId].sending = !new_state[action.threadId].sending;
       return new_state;
     case 'CLEAR_THREADS':
       return null;

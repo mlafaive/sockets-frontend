@@ -7,10 +7,15 @@ import {
   addMessage, 
   setMessages, 
   setCurrentMessage, 
+  toggleSending,
   toggleSettings, 
   setThreads,
-  addThread 
+  addThread
 } from '../../actions/threads.js';
+
+import { 
+  clearSocket 
+} from '../../actions/socket.js';
 
 import Sidebar from '../sidebar/Sidebar.js';
 
@@ -19,21 +24,18 @@ import './Thread.css';
 class Thread extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      sending: false,
-      message: ''
-    };
+    if (!this.props.user) {
+      var url = this.props.match.params.threadId ? '/login?thread=' + this.props.match.params.threadId : '/login';
+      this.props.history.replace(url);
+      return;
+    }
+    this.state = {};
 
-    this.socket = window.socketCluster.connect({
-      hostname: 'sockets-app.herokuapp.com',
-      secure: true,
-      port: 443
-    });
     var self = this;
-    var personalChannel = this.socket.subscribe(this.props.user.email);
+    var personalChannel = this.props.socket.subscribe(this.props.user.email);
     personalChannel.watch(this.props.addThread);
     personalChannel.on('subscribe', function () { 
-      self.socket.emit('threads', self.props.user.email, function (err, threads) {
+      self.props.socket.emit('threads', null, function (err, threads) {
         if (err) {
           console.error(err);
           return;
@@ -121,7 +123,7 @@ class Thread extends Component {
   }
   fetchMessages() {
     var self = this;
-    var chatChannel = this.socket.subscribe('chat-' + this.props.match.params.threadId);
+    var chatChannel = this.props.socket.subscribe('chat-' + this.props.match.params.threadId);
     chatChannel.watch(this.addMessage(this));
     chatChannel.on('subscribe', function () { 
       self.socket.emit(
@@ -149,15 +151,13 @@ class Thread extends Component {
       user: this.props.user.email,
       threadId: this.props.match.params.threadId
     }
-    this.socket.emit('chat', msg, function (err) {
+    this.props.socket.emit('chat', msg, function (err) {
       if (err) {
         console.error(err);
         return;
       }
-      self.setState({
-        sending: false,
-        message: ''
-      });
+      self.props.toggleSending();
+      self.props.setCurrentMessage('');
     });
   }
   componentDidUpdate(prevProps) {
@@ -189,7 +189,8 @@ class Thread extends Component {
 function mapStateToProps(state) {
   return {
      threads: state.threads,
-     user: state.user
+     user: state.user,
+     socket: state.socket
   };
 }
 
@@ -199,8 +200,10 @@ function mapDispatchToProps(dispatch) {
     setMessages,
     setCurrentMessage,
     toggleSettings,
+    toggleSending,
     setThreads,
-    addThread
+    addThread,
+    clearSocket
   }, dispatch);
 }
 

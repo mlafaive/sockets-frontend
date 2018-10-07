@@ -1,4 +1,4 @@
-export function user(state = {email: 'user@email.com'}, action) {
+export function user(state = null, action) {
   switch (action.type) {
   	case 'SET_USER':
       return {

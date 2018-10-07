@@ -14,6 +14,13 @@ export function setCurrentMessage(threadId, message) {
   };
 }
 
+export function toggleSending(threadId) {
+  return {
+    type: 'TOGGLE_SENDING',
+    threadId: threadId
+  };
+}
+
 export function toggleSettings(threadId) {
   return {
     type: 'TOGGLE_SETTINGS',
